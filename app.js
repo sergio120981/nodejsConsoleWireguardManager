@@ -53,7 +53,12 @@ const main = async () => {
 						r = await db.getFileInfo(opt);
 						if(r.length==1){
 							const nR = await showInterfaceInfo(r[0]);
-							console.log(nR);
+							
+							if(await db.saveInterfaceData(nR))
+								console.log('Actualizado satisfactoriamente.'.green);
+							else
+								console.log('No se actualizo correctamente.');
+
 						}
 						else
 							console.log('No se cuenta 1 registro en la captura de informacion, opt 1.2.'.red);
@@ -67,8 +72,21 @@ const main = async () => {
 				}
 
 				break;
-				showInterfaceInfo
 
+
+			case 1.3:
+
+				const opt3 = await listFiles(await db.getConfigFiles());
+				if(opt3){
+					console.log('seleccionado '+opt3);
+				}
+				else
+					console.log('No se selecciono fichero a borrar'.red);
+
+
+				break;
+				
+			case 2:
 				confFile = await listFiles(await db.getConfigFiles());
 				if(confFile===0)console.log('No se ha escogido fichero de configuracion');
 				break;

@@ -1,6 +1,7 @@
 const inquirer = require("inquirer");
 let fs=require('fs');
-const { red } = require("colors");
+const { red, green } = require("colors");
+const { resolve } = require("path");
 require("colors");
 
 const inquirerMenu=async()=>{
@@ -169,21 +170,7 @@ const listFiles= async( arrayFiles ) => {
     };
 
     const showInterfaceInfo = async (info) => {
-
         const question = [
-            {
-                type: "input",
-                name: 'id',
-                message: 'Ruta del fichero de configuracion: ',
-                default: info.id,
-                validate(value){
-                    if(value.length===0){
-                        return 'Ingrese un valor';
-                    }
-                    //agregar mas condiciones a la creacion del fichero en el fs
-                    return true;
-                }
-            },
             {
                 type: "input",
                 name: 'address',
@@ -200,7 +187,7 @@ const listFiles= async( arrayFiles ) => {
             {
                 type: "input",
                 name: 'listenPort',
-                message: 'ListenPort (51820 default): ',
+                message: 'ListenPort: ',
                 default: info.listenPort
             },
             {
@@ -223,9 +210,11 @@ const listFiles= async( arrayFiles ) => {
             }
         ];
         console.log('');
-        console.log('...Correccion de la configuracion...'.green);
+        console.log('...Correccion de la configuracion del fichero...'.green);
+        console.log(green(info.id));
         console.log('');
         const resp = await inquirer.prompt ( question );
+        resp['id']=info.id;
         return resp;
     }
 

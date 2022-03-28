@@ -45,6 +45,19 @@ class BD{
     getFileInfo(f){
         return this._query('select * from wg_interface where id=?', [f]);
     }
+
+    saveInterfaceData(newRecord){
+        const sql=`
+        update wg_interface
+            set address='${newRecord.address?newRecord.address:''}',
+            listenPort=${newRecord.listenPort?newRecord.listenPort:51820},
+            privateKey='${newRecord.privateKey?newRecord.privateKey:''}', 
+            postUp='${newRecord.postUp?newRecord.postUp:''}',
+            postDown='${newRecord.postDown?newRecord.postDown:''}' 
+        where id='${newRecord.id}'
+        `;
+        return this._run(sql, []);
+    }
 }
 
 module.exports = BD;
