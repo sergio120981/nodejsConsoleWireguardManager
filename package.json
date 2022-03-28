@@ -18,6 +18,8 @@
   "homepage": "https://github.com/sergio120981/nodejsConsoleWireguardManager#readme",
   "dependencies": {
     "colors": "1.4.0",
-    "inquirer": "8.2.1"
+    "dotenv": "16.0.0",
+    "inquirer": "8.2.1",
+    "sqlite3": "5.0.2"
   }
 }
