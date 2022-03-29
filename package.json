@@ -20,6 +20,7 @@
     "colors": "1.4.0",
     "dotenv": "16.0.0",
     "inquirer": "8.2.1",
-    "sqlite3": "5.0.2"
+    "sqlite3": "4.2.0",
+    "validator": "13.7.0"
   }
 }

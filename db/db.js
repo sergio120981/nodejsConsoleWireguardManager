@@ -6,8 +6,18 @@ class BD{
     constructor(){
         this._db = new sqlite3.Database(process.env.WG_DB, sqlite3.OPEN_READWRITE,(err) => {
             if (err) throw ('Error de conexion a la BD: '+err.message); });
+        try {
+            if(!this._run('PRAGMA foreign_keys = ON'))
+                console.log('Incorrecta actualizacion'.red);
+        } catch (error) {
+            console.log('Problema con PRAGMA !!!'.white.bgBlack);
+        }
     }
     
+    close(){
+        return this._db.close();
+    };
+
     _query(sql, params){
         return new Promise((resolve, reject) => {
             this._db.all(sql, params==undefined ? [] : params, (err, rows) => {
@@ -60,8 +70,13 @@ class BD{
     }
 
     deleteFile(file){
-        const sql=`delete from wg_interface where id=?`;
-        return this._query(sql, [file]);
+        const sql=`delete from wg_interface where id='${file}'`;
+        return this._query(sql, []);
+    }
+
+    getPeerList(interface_id){
+        const sql='select usuario, allowedIps from wg_peer where interface_id=? order by allowedIps';
+        return this._query(sql, [interface_id]);
     }
 }
 

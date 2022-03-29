@@ -1,4 +1,5 @@
 const inquirer = require("inquirer");
+const validator= require("validator");
 let fs=require('fs');
 const { red, green } = require("colors");
 const { resolve } = require("path");
@@ -13,50 +14,55 @@ const inquirerMenu=async()=>{
 	const preguntas=[{
 	    type: "list",
 	    name: "opcion",
+        pageSize: 20,
+        loop: false,
 	    message: "Que desea hacer?",
 	    choices:[
-            
-            {
-                name: `${'1. '.green} Gestionar fichero de configuracion.`
-            },
+
+            new inquirer.Separator(`${'1. '.green} ${'Gestionar fichero de configuracion.'.white}`),
             {
                 value: 1.1,
-                name: `${'1.1. '.green} Crear fichero de configuracion.`
+                name: `${'1.1. '.green} Crear.`
             },
             {
                 value: 1.2,
-                name: `${'1.2. '.green} Modificar fichero de configuracion.`
+                name: `${'1.2. '.green} Modificar.`
             },
             {
                 value: 1.3,
-                name: `${'1.3. '.green} Eliminar fichero de configuracion.`
+                name: `${'1.3. '.green} Eliminar.`
             },
             {
                 value: 2,
                 name: `${'2. '.green} Seleccionar fichero de configuracion.`
             },
+            new inquirer.Separator(`${'3. '.green} ${'Configurar Peer.'}`),
             {
-                value: 3,
-                name: `${'3. '.green} Configurar Peer.`
+                value: 3.1,
+                name: `${'3.1. '.green} Listado.`
             },
             {
-                value: 4,
-                name: `${'4. '.green} .`
+                value: 3.2,
+                name: `${'3.2. '.green} Nuevo.`
             },
             {
-                value: 5,
-                name: `${'5. '.green} .`
+                value: 3.3,
+                name: `${'3.3. '.green} Actualizar.`
             },
             {
-                value: 6,
-                name: `${'6. '.green} .`
+                value: 3.4,
+                name: `${'3.4. '.green} Eliminar.`
             },
+            new inquirer.Separator(),
             {
                 value: 0,
                 name: '0. Salir'.red
-            }
+            },
+            new inquirer.Separator()
 	    ]
 	}];
+
+
 
     const {opcion}= await inquirer.prompt(preguntas);
     return opcion;
@@ -114,7 +120,7 @@ const listFiles= async( arrayFiles ) => {
 	    choices}];
     console.log('');
     const {opcion}= await inquirer.prompt(preguntas);
-    
+    console.log('');
     return opcion;    
 }
 
@@ -140,7 +146,9 @@ const listFiles= async( arrayFiles ) => {
                     if(value.length===0){
                         return 'Ingrese un valor';
                     }
-                    /// restriccion de segmento IP
+                    if(!validator.isIPRange(value)){
+                        return 'Ingrese un rango IP correcto formato IP/(mask 32bits)';
+                    }
                     return true;
                 }
             },
@@ -181,7 +189,9 @@ const listFiles= async( arrayFiles ) => {
                     if(value.length===0){
                         return 'Ingrese un valor';
                     }
-                    /// restriccion de segmento IP
+                    if(!validator.isIPRange(value)){
+                        return 'Ingrese un rango IP correcto formato IP/(mask 32bits)';
+                    }
                     return true;
                 }
             },

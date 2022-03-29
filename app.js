@@ -19,7 +19,7 @@ const main = async () => {
 	let opt=0;
 	let confFile='';
 
-	const db=new BD;
+	let db;
 
 	do{
 	
@@ -33,7 +33,11 @@ const main = async () => {
 
 				let resp = await createConfigFile();
 				try{
+					
+					db=new BD;
 					let q = await db.saveInterface(resp);
+					db.close();
+
 					if(q)console.log('Completado con exito.'.green);
 					else console.log('Algo raro paso'.red);
 				}
@@ -45,8 +49,11 @@ const main = async () => {
 
 
 			case 1.2:
+				db=new BD;
+				const resp12=await db.getConfigFiles();
+				
 
-				const opt = await listFiles(await db.getConfigFiles());
+				const opt = await listFiles(resp12);
 				console.log('');
 				let r;
 				if(opt){
@@ -65,25 +72,29 @@ const main = async () => {
 							console.log('No se cuenta 1 registro en la captura de informacion, opt 1.2.'.red);
 					}
 					catch(err){
-						throw err;
+						//throw err;
 						console.log('Errores detectados en la busqueda de FILE.'.red);
 					}
 					
 					//console.log(r);
 				}
-
+				db.close();
 				break;
 
 
 			case 1.3:
 
-				const opt3 = await listFiles(await db.getConfigFiles());
+				db=new BD;
+				const resp13=await db.getConfigFiles();
+
+				const opt3 = await listFiles(resp13);
 				if(opt3){
 					
 					if(await getConfirmationDeleteFile(opt3))
 						try {
 							if(await db.deleteFile(opt3))
 								{
+									confFile=undefined;
 									console.log('');
 									console.log(`Se ha eliminado con exito: ${opt3}`.green);
 								}
@@ -98,26 +109,41 @@ const main = async () => {
 							console.log(`No se pudo eliminar el registro: ${opt3}`.red);
 						}
 
-				}
-				else
-					console.log('No se selecciono fichero a borrar'.red);
+					}
+					else
+						console.log('No se selecciono fichero a borrar'.red);
 
+					db.close();
+				
 				break;
 				
 			case 2:
-				confFile = await listFiles(await db.getConfigFiles());
+
+				db=new BD;
+				const resp2=await db.getConfigFiles();
+
+				confFile = await listFiles(resp2);
+
 				if(confFile===0)console.log('No se ha escogido fichero de configuracion');
+				
+				db.close();
+
 				break;
 
-			case 3:
+
+			case 3.1:
 
 				if(confFile) {
-					console.log('aqui estamos');
+					
+					db=new BD();
+					const resp31=await db.getPeerList(confFile);
+					console.log(resp31);
+					db.close();
+
+
 				}
-				else{
-					console.log('');
+				else
 					console.log(`No se ha seleccionado ningun fichero para trabajarlo.`.red);
-				}
 
 				break;
 			
