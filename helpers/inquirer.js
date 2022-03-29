@@ -37,19 +37,19 @@ const inquirerMenu=async()=>{
             },
             {
                 value: 3,
-                name: `${'3. '.green} Configurar parametros de Interface.`
+                name: `${'3. '.green} Configurar Peer.`
             },
             {
                 value: 4,
-                name: `${'4. '.green} Configurar nuevo Peer.`
+                name: `${'4. '.green} .`
             },
             {
                 value: 5,
-                name: `${'5. '.green} Ver configuracion del servidor.`
+                name: `${'5. '.green} .`
             },
             {
                 value: 6,
-                name: `${'6. '.green} Exportar configuracion de cliente.`
+                name: `${'6. '.green} .`
             },
             {
                 value: 0,
@@ -97,7 +97,7 @@ const listarFicherosWG= async( arrayFiles ) => {
 
 
 const listFiles= async( arrayFiles ) => {
-    console.clear();
+    //console.clear();
 
     let choices=[];
     
@@ -110,10 +110,11 @@ const listFiles= async( arrayFiles ) => {
 	const preguntas=[{
 	    type: "list",
 	    name: "opcion",
-	    message: "Selecciones el fichero de configuracion?",
+	    message: "Seleccione el fichero de configuracion: ".green,
 	    choices}];
-
+    console.log('');
     const {opcion}= await inquirer.prompt(preguntas);
+    
     return opcion;    
 }
 
@@ -218,11 +219,24 @@ const listFiles= async( arrayFiles ) => {
         return resp;
     }
 
+    const getConfirmationDeleteFile = async( file ) => {
+        const question = [
+            {
+                type: "confirm",
+                name: 'confirm',
+                message: 'Seguro que desea eliminar el registro correspondiente a: '.green+file,
+            }];
+        console.log('');
+        const resp = await inquirer.prompt ( question );
+        return resp;
+    }
+
 module.exports={
 	inquirerMenu,
 	pausa,
     listarFicherosWG,
     listFiles,
     createConfigFile,
-    showInterfaceInfo
+    showInterfaceInfo,
+    getConfirmationDeleteFile
 };

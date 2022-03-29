@@ -58,6 +58,11 @@ class BD{
         `;
         return this._run(sql, []);
     }
+
+    deleteFile(file){
+        const sql=`delete from wg_interface where id=?`;
+        return this._query(sql, [file]);
+    }
 }
 
 module.exports = BD;

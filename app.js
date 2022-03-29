@@ -11,7 +11,7 @@ require("colors");
 require('dotenv').config();
 
 const BD = require("./db/db");
-const { inquirerMenu, pausa, listFiles, createConfigFile, showInterfaceInfo } = require("./helpers/inquirer");
+const { inquirerMenu, pausa, listFiles, createConfigFile, showInterfaceInfo, getConfirmationDeleteFile } = require("./helpers/inquirer");
 
 
 const main = async () => {
@@ -47,6 +47,7 @@ const main = async () => {
 			case 1.2:
 
 				const opt = await listFiles(await db.getConfigFiles());
+				console.log('');
 				let r;
 				if(opt){
 					try{
@@ -78,17 +79,46 @@ const main = async () => {
 
 				const opt3 = await listFiles(await db.getConfigFiles());
 				if(opt3){
-					console.log('seleccionado '+opt3);
+					
+					if(await getConfirmationDeleteFile(opt3))
+						try {
+							if(await db.deleteFile(opt3))
+								{
+									console.log('');
+									console.log(`Se ha eliminado con exito: ${opt3}`.green);
+								}
+							else
+							{
+								console.log('');
+								console.log(`Ha ocurrido algun error eliminando el registro: ${opt3}`.red);
+							}
+								
+						} catch (error) {
+							console.log('');
+							console.log(`No se pudo eliminar el registro: ${opt3}`.red);
+						}
+
 				}
 				else
 					console.log('No se selecciono fichero a borrar'.red);
-
 
 				break;
 				
 			case 2:
 				confFile = await listFiles(await db.getConfigFiles());
 				if(confFile===0)console.log('No se ha escogido fichero de configuracion');
+				break;
+
+			case 3:
+
+				if(confFile) {
+					console.log('aqui estamos');
+				}
+				else{
+					console.log('');
+					console.log(`No se ha seleccionado ningun fichero para trabajarlo.`.red);
+				}
+
 				break;
 			
 		}
