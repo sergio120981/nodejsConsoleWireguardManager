@@ -74,8 +74,15 @@ class BD{
         return this._query(sql, []);
     }
 
-    getPeerList(interface_id){
-        const sql='select usuario, allowedIps from wg_peer where interface_id=? order by allowedIps';
+    getPeerList(interface_id, orderByParam){
+        const sql=`select id, usuario,length(usuario) as size, case when allowedIps is null then 'SIN ASIGNAR' else allowedIps end as allowedIps from wg_peer where interface_id=? order by ${orderByParam}`;
+        //console.log(sql);
+        return this._query(sql, [interface_id]);
+    }
+
+    getUserMaxSize(interface_id){
+        const sql='select case when max(length(usuario))>0 then max(length(usuario)) else 0 end as size from wg_peer where interface_id=?';
+        //console.log(sql);
         return this._query(sql, [interface_id]);
     }
 }

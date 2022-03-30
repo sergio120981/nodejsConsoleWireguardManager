@@ -3,6 +3,7 @@ const validator= require("validator");
 let fs=require('fs');
 const { red, green } = require("colors");
 const { resolve } = require("path");
+const { Separator } = require("inquirer");
 require("colors");
 
 const inquirerMenu=async()=>{
@@ -48,10 +49,6 @@ const inquirerMenu=async()=>{
             {
                 value: 3.3,
                 name: `${'3.3. '.green} Actualizar.`
-            },
-            {
-                value: 3.4,
-                name: `${'3.4. '.green} Eliminar.`
             },
             new inquirer.Separator(),
             {
@@ -204,7 +201,7 @@ const listFiles= async( arrayFiles ) => {
             {
                 type: "input",
                 name: 'privateKey',
-                message: 'PrivateKey: ',
+                message: 'privateKey: ',
                 default: info.privateKey
             },
             {
@@ -241,6 +238,94 @@ const listFiles= async( arrayFiles ) => {
         return resp;
     }
 
+    const seleccionarUserIp= async () => {
+        const question = [
+            {
+                type: "checkbox",
+                name: 'seleccion',
+                message: 'Ordenar por: '.green,
+                choices: [
+                    new inquirer.Separator(),
+                    {
+                      name: 'Usuario',
+                      value: 'usuario'
+                    },
+                    {
+                      name: 'Direccion IP',
+                      value: 'allowedIps'
+                    }],
+                
+                validate(answer) {
+                    if (answer.length != 1 ) {
+                        return 'Debe seleccionar solo uno...'.red;
+                    }
+            
+                    return true;
+                }
+            }];
+        console.log('');
+        const resp = await inquirer.prompt ( question );
+        return resp;
+    }
+
+    const printUsers = async (users, maxSize) => {
+        console.log('');      
+        /* const userHeader='Usuarios';
+        const eS=' '.repeat(maxSize-userHeader.length+2);
+        const header=`${userHeader}${eS} | AllowedIps`;
+ */
+        let choices=[];
+//        choices.push({value: header});
+
+        users.forEach(user => {
+            const vacio=' '.repeat(maxSize-user.size+2);
+            choices.push({name:`${user.usuario}${vacio} | ${user.allowedIps}`, value:user.id});
+        });
+
+        const listado=[{
+            type: "list",
+            name: "opcion",
+            pageSize: 10,
+            loop: true,
+            message: "Listado de usuarios".green,
+            choices}];
+        
+        const {opcion}= await inquirer.prompt(listado);
+        return opcion;
+    }
+
+    const showOpciones = async (usuario) => {
+        console.log('');
+        const listado=[{
+            type: "list",
+            name: "opcion",
+            message: `Acciones a realizar con el usuario: ${usuario}`.green,
+            choices:[
+                {name: 'Actualizar', value: 1},
+                {name: 'Eliminar', value: 2},
+                new inquirer.Separator(),
+                {name: 'Cancelar'.red, value: 0}
+            ]
+        }];
+        const {opcion}= await inquirer.prompt(listado);
+        return opcion;
+    }
+
+    const confirmarBorrado = async () => {
+        console.log('');
+        const questions = [
+            {
+              type: 'confirm',
+              name: 'opcion',
+              message: 'Esta seguro que desea eliminar el usuario?',
+              default: true
+            }
+          ];
+          
+          const {opcion}= await inquirer.prompt(questions);
+          return opcion;
+    }
+
 module.exports={
 	inquirerMenu,
 	pausa,
@@ -248,5 +333,9 @@ module.exports={
     listFiles,
     createConfigFile,
     showInterfaceInfo,
-    getConfirmationDeleteFile
+    getConfirmationDeleteFile,
+    seleccionarUserIp,
+    printUsers,
+    showOpciones,
+    confirmarBorrado
 };

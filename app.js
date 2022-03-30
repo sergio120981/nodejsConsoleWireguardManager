@@ -11,7 +11,16 @@ require("colors");
 require('dotenv').config();
 
 const BD = require("./db/db");
-const { inquirerMenu, pausa, listFiles, createConfigFile, showInterfaceInfo, getConfirmationDeleteFile } = require("./helpers/inquirer");
+const { inquirerMenu, 
+		pausa, 
+		listFiles, 
+		createConfigFile, 
+		showInterfaceInfo, 
+		getConfirmationDeleteFile, 
+		seleccionarUserIp,
+		printUsers,
+		showOpciones,
+		confirmarBorrado} = require("./helpers/inquirer");
 
 
 const main = async () => {
@@ -73,7 +82,7 @@ const main = async () => {
 					}
 					catch(err){
 						//throw err;
-						console.log('Errores detectados en la busqueda de FILE.'.red);
+						throw('Errores detectados en la busqueda de FILE.'.red);
 					}
 					
 					//console.log(r);
@@ -135,11 +144,49 @@ const main = async () => {
 
 				if(confFile) {
 					
-					db=new BD();
-					const resp31=await db.getPeerList(confFile);
-					console.log(resp31);
-					db.close();
+					let {seleccion}=await seleccionarUserIp();
 
+					db=new BD();
+					
+					let resp31, maxUserSize;
+					try {
+						resp31=await db.getPeerList(confFile, seleccion[0]);
+						maxUserSize= await db.getUserMaxSize(confFile);
+					} catch (error) {
+						console.log('');
+						console.log ('Error en el listado de usuarios'.red+error);
+					}
+
+					if(resp31===[] || maxUserSize[0].size==0){
+							console.log('');
+							console.log ('Listado vacio para este fichero: '.red+confFile);
+							console.log('');
+							break;
+					}
+					else{
+						let user, opcion;
+						try {
+							user = await printUsers(resp31, maxUserSize[0].size);
+							opcion= await showOpciones(user);
+							
+						} catch (error) {
+							console.log('Error seleccionando usuario Peer'.red);
+						}
+						
+						switch (opcion){
+							case 0: break;
+							case 2:
+								const confirmarBorradoOption= await confirmarBorrado();
+
+								/// confirmar el borrado en la BD
+								
+								break;
+							case 1:
+								break;
+						}
+					}
+
+					db.close();
 
 				}
 				else
