@@ -319,10 +319,128 @@ const listFiles= async( arrayFiles ) => {
               message: 'Esta seguro que desea eliminar el usuario?',
               default: true
             }
-          ];
+        ];
           
-          const {opcion}= await inquirer.prompt(questions);
-          return opcion;
+        const {opcion}= await inquirer.prompt(questions);
+        return opcion;
+    }
+
+    const showPeerInfo = async (info, keyPub) => {
+
+        console.log('');
+        console.log('New keys are recommended:');
+        console.log(`Private Key: ${keyPub[0]}`);
+        console.log(`Public Key: ${keyPub[1]}`);
+        console.log('');
+        
+
+        const questions = [
+            {
+                type: "input",
+                name: 'publicKey',
+                message: 'PublicKey: ',
+                default: info.publicKey,
+                validate(value){
+                    if(value.length===0){
+                        return 'Ingrese un valor';
+                    }
+                    return true;
+                }
+            },
+            {
+                type: "input",
+                name: 'allowedIps',
+                message: 'AllowedIps: ',
+                default: info.allowedIps,
+                validate(value){
+                    if(value.length===0){
+                        return 'Ingrese un valor';
+                    }
+                    if(!validator.isIPRange(value)){
+                        return 'Ingrese un rango IP correcto formato IP/(mask 32bits)';
+                    }
+                    return true;
+                }
+            },
+            {
+                type: "input",
+                name: 'interfacePrivateKey',
+                message: 'Interface PrivateKey: ',
+                default: info.interfacePrivateKey,
+                validate(value){
+                    if(value.length===0){
+                        return 'Ingrese un valor';
+                    }
+                    return true;
+                }
+            },
+            {
+                type: "input",
+                name: 'interfaceAdress',
+                message: 'Interface Address: ',
+                default: info.interfaceAdress,
+                validate(value){
+                    if(value.length===0){
+                        return 'Ingrese un valor';
+                    }
+                    if(!validator.isIPRange(value)){
+                        return 'Ingrese un rango IP correcto formato IP/(mask 32bits)';
+                    }
+                    return true;
+                }
+            },
+            {
+                type: "input",
+                name: 'interfaceDns',
+                message: 'Interface DNS: ',
+                default: info.interfaceDns,
+                validate(value){
+                    if(!validator.isIP(value)){
+                        return 'Ingrese un rango IP correcto formato IP';
+                    }
+                    return true;
+                }
+            },
+            {
+                type: "input",
+                name: 'peerEndPoint',
+                message: 'Peer EndPoint:',
+                default: info.peerEndPoint,
+                validate(value){
+                    if(!validator.isURL(value, 
+                        [{ 
+                            protocols: ['http','https'], require_tld: false, require_protocol: false, 
+                            require_host: true, require_port: true, require_valid_protocol: false, 
+                            allow_underscores: false, host_whitelist: false, host_blacklist: false, 
+                            allow_trailing_dot: false, allow_protocol_relative_urls: false, 
+                            allow_fragments: false, allow_query_components: false, disallow_auth: false, 
+                            validate_length: false }]))
+                        return 'Ingrese un rango IP correcto formato IP:Puerto(1-65.535)';
+                    return true;
+                }
+            },
+            {
+                type: "input",
+                name: 'peerAllowedIps',
+                message: 'Peer AllowedIps: ',
+                default: info.peerAllowedIps,
+                validate(value){
+                    if(!validator.isIPRange(value)){
+                        return 'Ingrese un rango IP correcto formato IP/(mask 32bits)';
+                    }
+                    return true;
+                }
+            },
+            {
+                type: "input",
+                name: 'peerPersistentKeepAlive',
+                message: 'Peer PersistentKeepAlive: ',
+                default: info.peerPersistentKeepAlive
+            }
+        ];
+
+        const opcion= await inquirer.prompt(questions);
+        return opcion;
     }
 
 module.exports={
@@ -336,5 +454,6 @@ module.exports={
     seleccionarUserIp,
     printUsers,
     showOpciones,
-    confirmarBorrado
+    confirmarBorrado, 
+    showPeerInfo
 };

@@ -85,6 +85,32 @@ class BD{
         //console.log(sql);
         return this._query(sql, [interface_id]);
     }
+
+    deletePeer(peer_id){
+        const sql='delete from wg_peer where id=?';
+        return this._query(sql, [peer_id]);
+    }
+
+    getPeerData4Update(user){
+        const sql='select * from wg_peer where id=?';
+        return this._query(sql, [user]);
+    }
+
+    updatePeerById(data, userId){
+        const sql=`
+        update wg_peer 
+        set 
+            publicKey='${data.publicKey}',
+            allowedIps='${data.allowedIps}',
+            interfacePrivateKey='${data.interfacePrivateKey}',
+            interfaceAdress='${data.interfaceAdress}',
+            interfaceDns='${data.interfaceDns}',
+            peerEndPoint='${data.peerEndPoint}',
+            peerAllowedIps='${data.peerAllowedIps}',
+            peerPersistentKeepAlive='${data.peerPersistentKeepAlive}'
+        where id=${userId}`;
+        return this._query(sql, [data]);
+    }
 }
 
 module.exports = BD;

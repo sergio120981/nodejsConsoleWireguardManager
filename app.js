@@ -11,6 +11,7 @@ require("colors");
 require('dotenv').config();
 
 const BD = require("./db/db");
+const getKeyAndPub = require('./helpers/wireguard');
 const { inquirerMenu, 
 		pausa, 
 		listFiles, 
@@ -20,7 +21,8 @@ const { inquirerMenu,
 		seleccionarUserIp,
 		printUsers,
 		showOpciones,
-		confirmarBorrado} = require("./helpers/inquirer");
+		confirmarBorrado, 
+		showPeerInfo } = require("./helpers/inquirer");
 
 
 const main = async () => {
@@ -33,6 +35,7 @@ const main = async () => {
 	do{
 	
 		opt = await inquirerMenu();
+		
 		
 
 		switch (opt){
@@ -176,12 +179,34 @@ const main = async () => {
 						switch (opcion){
 							case 0: break;
 							case 2:
-								const confirmarBorradoOption= await confirmarBorrado();
-
-								/// confirmar el borrado en la BD
-								
+								if(await confirmarBorrado()){
+									//borrado
+									try {
+										if(await db.deletePeer(user))
+											console.log('\r\nUsuario eliminado con exito'.green);
+									} catch (error) {
+										console.log(`No se pudo eliminar el registro Peer.`.red);
+									}
+								}
 								break;
 							case 1:
+								try {
+									const userData=await db.getPeerData4Update(user);
+
+									const k = await getKeyAndPub();
+
+									const userDataChanged = await showPeerInfo(userData[0], k);
+
+									console.log(userData[0].id ,userDataChanged);
+
+									if(await db.updatePeerById(userDataChanged, user)){
+										console.log('El usuario se ha actualizado correctamente'.green);
+									}
+									else
+										console.log('El usuario no se pudo actualizar'.red);
+								} catch (error) {
+									console.log(`No se pudo actualizar el registro Peer.`.red);
+								}
 								break;
 						}
 					}
