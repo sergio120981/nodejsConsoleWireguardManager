@@ -3,7 +3,6 @@ const validator= require("validator");
 let fs=require('fs');
 const { red, green } = require("colors");
 const { resolve } = require("path");
-const { Separator } = require("inquirer");
 require("colors");
 
 const inquirerMenu=async()=>{
