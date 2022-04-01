@@ -1,4 +1,6 @@
 const { exec } = require('child_process');
+const fs = require('fs');
+const moment = require('moment');
 
 const getKeyAndPub = async () => {
 
@@ -21,8 +23,25 @@ const getKeyAndPub = async () => {
     });
 }
 
-const saveWgConfig = async (file) => {
-    return new Promise();
+const mvWgConfig = async (file) => {
+    return new Promise((resolve, reject)=>{
+        exec(`mv ${file} ${file}.bak.${moment().format('YYYY-MM-DD_HH-m-s')}`, (error, stdout, stderr) => {
+            if (error) {
+                reject(`error: ${error.message}`);
+                return;
+            }
+        
+            if (stderr) {
+                reject(`stderr: ${stderr}`);
+                return;
+            }
+            resolve(true);
+        }); 
+    })
 }
 
-module.exports={getKeyAndPub, saveWgConfig};
+const putNewWgConfig = (file) => {
+    //ver ejemplo de w.js
+}
+
+module.exports={getKeyAndPub, mvWgConfig, putNewWgConfig};

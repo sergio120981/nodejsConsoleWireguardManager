@@ -11,7 +11,7 @@ require("colors");
 require('dotenv').config();
 
 const BD = require("./db/db");
-const {getKeyAndPub} = require('./helpers/wireguard');
+const {getKeyAndPub, mvWgConfig, putNewWgConfig} = require('./helpers/wireguard');
 const { inquirerMenu, 
 		pausa, 
 		listFiles, 
@@ -264,7 +264,25 @@ const main = async () => {
 				break;
 
 			case 4.1:
-					console.log('Generando fichero de configuracion');
+				if(confFile) {
+					if(await mvWgConfig(confFile)){
+						console.log('');
+						console.log('Fichero de configuracion salvado con exito'.green);
+						if(await putNewWgConfig(file)){
+							console.log('');
+							console.log('Generado satisfactoriamente el nuevo fichero de configuracion'.green);
+						}
+						else{
+							console.log('No se pudo generar el fichero de configuracion');
+						}
+					}
+					else
+						console.log('No se pudo salvar el fichero de configuracion: '.green+confFile);
+
+					
+				}
+				else
+					console.log(`No se ha seleccionado ningun fichero para trabajarlo.`.red);
 				break;
 
 			case 4.2:
