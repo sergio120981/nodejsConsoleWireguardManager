@@ -14,6 +14,29 @@ const printUserInfo = (info) => {
     console.log(`${'PeerPersistentKeepAlive'.green}: ${info[0].peerPersistentKeepAlive}`);
 }
 
+const printUsersConfigFiles = (userList)=>{
+    userList.forEach(user => {
+
+        console.log(`Config file para el usuario: ${user.usuario}`.yellow);
+
+        console.log('[Interface]');
+        console.log(`PrivateKey = ${user.interfacePrivateKey}`);
+        console.log(`Address = ${user.interfaceAdress}`);
+        console.log(`DNS = ${user.interfaceDns}`);
+        console.log('');
+        console.log('[Peer]');
+        console.log(`PublicKey = ${user.peerPublicKey}`);
+        console.log(`Endpoint = ${user.peerEndPoint}`);
+        console.log(`AllowedIPs = ${user.peerAllowedIps}`);
+        console.log(`PersistentKeepalive = ${user.peerPersistentKeepAlive}`);
+        console.log('');
+
+        console.log('');
+
+    });
+}
+
 module.exports={
-    printUserInfo
+    printUserInfo,
+    printUsersConfigFiles
 }

@@ -21,4 +21,8 @@ const getKeyAndPub = async () => {
     });
 }
 
-module.exports=getKeyAndPub;
+const saveWgConfig = async (file) => {
+    return new Promise();
+}
+
+module.exports={getKeyAndPub, saveWgConfig};

@@ -141,9 +141,9 @@ class BD{
     }
 
     getPeerConfigFiles(ids){
-        const sql=`select * from wg_peer where id in (?)`; 
+        const sql=`select * from wg_peer where id in (${ids.join(',')})`; 
         
-        return this._query(sql, [id.join(',')]);
+        return this._query(sql, []);
     }
 }
 

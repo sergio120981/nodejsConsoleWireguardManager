@@ -11,7 +11,7 @@ require("colors");
 require('dotenv').config();
 
 const BD = require("./db/db");
-const getKeyAndPub = require('./helpers/wireguard');
+const {getKeyAndPub} = require('./helpers/wireguard');
 const { inquirerMenu, 
 		pausa, 
 		listFiles, 
@@ -27,8 +27,8 @@ const { inquirerMenu,
 		showUserList } = require("./helpers/inquirer");
 
 const {
-	printUserInfo
-	} = require('./helpers/print');
+	printUserInfo,
+	printUsersConfigFiles} = require('./helpers/print');
 
 
 const main = async () => {
@@ -273,10 +273,10 @@ const main = async () => {
 						try {
 							const userList= await db.getPeerUsersByInterfaceId(confFile);
 							const userListSelected = await showUserList(userList);
-							console.log(userListSelected);
+							
 							if(userListSelected.usersSelected.length!==0){
-								const usersConfigFiles= await db.getPeerConfigFiles();
-								await showUsersConfigFiles(usersConfigFiles);
+								const usersConfigFiles= await db.getPeerConfigFiles(userListSelected.usersSelected);
+								printUsersConfigFiles(usersConfigFiles);
 							}
 							else
 							{
@@ -285,7 +285,7 @@ const main = async () => {
 							}
 
 						} catch (error) {
-							console.error('No se pudo obtener el listado Peer')
+							throw('No se pudo obtener el listado Peer '+error);
 						}
 						db.close();
 						
