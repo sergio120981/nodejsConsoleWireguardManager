@@ -22,7 +22,13 @@ const { inquirerMenu,
 		printUsers,
 		showOpciones,
 		confirmarBorrado, 
-		showPeerInfo } = require("./helpers/inquirer");
+		showPeerInfo,
+		showNewPeer,
+		showUserList } = require("./helpers/inquirer");
+
+const {
+	printUserInfo
+	} = require('./helpers/print');
 
 
 const main = async () => {
@@ -197,8 +203,6 @@ const main = async () => {
 
 									const userDataChanged = await showPeerInfo(userData[0], k);
 
-									console.log(userData[0].id ,userDataChanged);
-
 									if(await db.updatePeerById(userDataChanged, user)){
 										console.log('El usuario se ha actualizado correctamente'.green);
 									}
@@ -207,6 +211,17 @@ const main = async () => {
 								} catch (error) {
 									console.log(`No se pudo actualizar el registro Peer.`.red);
 								}
+								break;
+							
+							case 3:
+								try {
+									const info= await db.getPeerById(user);
+									printUserInfo(info);
+									
+								} catch (error) {
+									console.log('No se pudo obtener la informacion del usuario. '.red +user);
+								}
+								
 								break;
 						}
 					}
@@ -217,6 +232,66 @@ const main = async () => {
 				else
 					console.log(`No se ha seleccionado ningun fichero para trabajarlo.`.red);
 
+				break;
+
+			case 3.2:
+				
+				if(confFile) {
+					
+					
+					
+					const k = await getKeyAndPub();
+					const newPeer= await showNewPeer(k);
+
+					newPeer.interface_id=confFile;
+
+					try {
+						db=new BD();
+						if(await db.insertPeer(newPeer)){
+							console.log('Registro insertado con exito en Peer'.green);
+							db.close();
+						}
+						else	
+							console.log('Error al insertar Peer'.red);
+					} catch (error) {
+						console.error('No se pudo insertar el nuevo registro Peer');
+					}
+				
+				}
+				else
+					console.log(`No se ha seleccionado ningun fichero para trabajarlo.`.red);
+
+				break;
+
+			case 4.1:
+					console.log('Generando fichero de configuracion');
+				break;
+
+			case 4.2:
+					if(confFile) {
+						db=new BD();
+						try {
+							const userList= await db.getPeerUsersByInterfaceId(confFile);
+							const userListSelected = await showUserList(userList);
+							console.log(userListSelected);
+							if(userListSelected.usersSelected.length!==0){
+								const usersConfigFiles= await db.getPeerConfigFiles();
+								await showUsersConfigFiles(usersConfigFiles);
+							}
+							else
+							{
+								console.log('');
+								console.log('No se seleccionaron usuarios'.red);
+							}
+
+						} catch (error) {
+							console.error('No se pudo obtener el listado Peer')
+						}
+						db.close();
+						
+					}
+					else
+						console.log(`No se ha seleccionado ningun fichero para trabajarlo.`.red);
 				break;
 			
 		}

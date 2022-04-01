@@ -106,10 +106,44 @@ class BD{
             interfaceAdress='${data.interfaceAdress}',
             interfaceDns='${data.interfaceDns}',
             peerEndPoint='${data.peerEndPoint}',
+            peerPublicKey='${data.peerPublicKey}',
             peerAllowedIps='${data.peerAllowedIps}',
             peerPersistentKeepAlive='${data.peerPersistentKeepAlive}'
         where id=${userId}`;
         return this._query(sql, [data]);
+    }
+
+    insertPeer(data){
+        const sql=`
+        insert into wg_peer 
+        (
+            usuario, publicKey, allowedIps, interfacePrivateKey, 
+            interfaceAdress, interfaceDns, peerPublicKey, peerEndPoint, 
+            peerAllowedIps, peerPersistentKeepAlive, interface_id) 
+        values (?,?,?,?,?,?,?,?,?,?, ?)`; 
+
+        return this._query(sql, 
+            [data.usuario, data.publicKey, data.allowedIps, data.interfacePrivateKey, data.interfaceAdress,
+                data.interfaceDns, data.peerPublicKey, data.peerEndPoint, data.peerAllowedIps,
+                data.peerPersistentKeepAlive, data.interface_id]);
+    }
+
+    getPeerById(id){
+        const sql=`select * from wg_peer where id = ?`; 
+
+        return this._query(sql, [id]);
+    }
+
+    getPeerUsersByInterfaceId(id){
+        const sql=`select id, usuario from wg_peer where interface_id = ? order by usuario`; 
+
+        return this._query(sql, [id]);
+    }
+
+    getPeerConfigFiles(ids){
+        const sql=`select * from wg_peer where id in (?)`; 
+        
+        return this._query(sql, [id.join(',')]);
     }
 }
 

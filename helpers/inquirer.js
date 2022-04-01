@@ -19,7 +19,7 @@ const inquirerMenu=async()=>{
 	    message: "Que desea hacer?",
 	    choices:[
 
-            new inquirer.Separator(`${'1. '.green} ${'Gestionar fichero de configuracion.'.white}`),
+            new inquirer.Separator(`${'1. '.green} ${'Gestionar fichero de configuracion.'.yellow}`),
             {
                 value: 1.1,
                 name: `${'1.1. '.green} Crear.`
@@ -36,7 +36,7 @@ const inquirerMenu=async()=>{
                 value: 2,
                 name: `${'2. '.green} Seleccionar fichero de configuracion.`
             },
-            new inquirer.Separator(`${'3. '.green} ${'Configurar Peer.'}`),
+            new inquirer.Separator(`${'3. '.green} ${'Configurar Peer.'.yellow}`),
             {
                 value: 3.1,
                 name: `${'3.1. '.green} Listado.`
@@ -45,9 +45,14 @@ const inquirerMenu=async()=>{
                 value: 3.2,
                 name: `${'3.2. '.green} Nuevo.`
             },
+            new inquirer.Separator(`${'4. '.green} ${'Generar ficheros.'.yellow}`),
             {
-                value: 3.3,
-                name: `${'3.3. '.green} Actualizar.`
+                value: 4.1,
+                name: `${'4.1. '.green} Configuracion de Interface.`
+            },
+            {
+                value: 4.2,
+                name: `${'4.2. '.green} Configuracion de usuario.`
             },
             new inquirer.Separator(),
             {
@@ -300,6 +305,9 @@ const listFiles= async( arrayFiles ) => {
             name: "opcion",
             message: `Acciones a realizar con el usuario: ${usuario}`.green,
             choices:[
+                new inquirer.Separator(),
+                {name: 'Ver detalles', value: 3},
+                new inquirer.Separator(),
                 {name: 'Actualizar', value: 1},
                 {name: 'Eliminar', value: 2},
                 new inquirer.Separator(),
@@ -327,19 +335,31 @@ const listFiles= async( arrayFiles ) => {
 
     const showPeerInfo = async (info, keyPub) => {
 
+        showKeys(keyPub)
+        
+        questions=getQuestions(info);
+
+
+        const opcion= await inquirer.prompt(questions);
+        return opcion;
+    }
+
+
+    const showKeys = (keyPub) => {
         console.log('');
         console.log('New keys are recommended:');
         console.log(`Private Key: ${keyPub[0]}`);
         console.log(`Public Key: ${keyPub[1]}`);
         console.log('');
-        
+    }
 
-        const questions = [
+    getQuestions=(defaultOptions=null)=>
+     [
             {
                 type: "input",
                 name: 'publicKey',
                 message: 'PublicKey: ',
-                default: info.publicKey,
+                default: defaultOptions.publicKey || '',
                 validate(value){
                     if(value.length===0){
                         return 'Ingrese un valor';
@@ -351,7 +371,7 @@ const listFiles= async( arrayFiles ) => {
                 type: "input",
                 name: 'allowedIps',
                 message: 'AllowedIps: ',
-                default: info.allowedIps,
+                default: defaultOptions.allowedIps || '1.0.0.1/32',
                 validate(value){
                     if(value.length===0){
                         return 'Ingrese un valor';
@@ -366,7 +386,7 @@ const listFiles= async( arrayFiles ) => {
                 type: "input",
                 name: 'interfacePrivateKey',
                 message: 'Interface PrivateKey: ',
-                default: info.interfacePrivateKey,
+                default: defaultOptions.interfacePrivateKey || '',
                 validate(value){
                     if(value.length===0){
                         return 'Ingrese un valor';
@@ -378,7 +398,7 @@ const listFiles= async( arrayFiles ) => {
                 type: "input",
                 name: 'interfaceAdress',
                 message: 'Interface Address: ',
-                default: info.interfaceAdress,
+                default: defaultOptions.interfaceAdress || '1.0.0.0/24',
                 validate(value){
                     if(value.length===0){
                         return 'Ingrese un valor';
@@ -393,7 +413,7 @@ const listFiles= async( arrayFiles ) => {
                 type: "input",
                 name: 'interfaceDns',
                 message: 'Interface DNS: ',
-                default: info.interfaceDns,
+                default: defaultOptions.interfaceDns || '8.8.8.8',
                 validate(value){
                     if(!validator.isIP(value)){
                         return 'Ingrese un rango IP correcto formato IP';
@@ -403,9 +423,21 @@ const listFiles= async( arrayFiles ) => {
             },
             {
                 type: "input",
+                name: 'peerPublicKey',
+                message: 'Peer PublicKey: ',
+                default: defaultOptions.peerPublicKey || 'xEstaAIivnyt77KTvWiO2mAXdoupFfGYg1r97oEDxyg=',
+                validate(value){
+                    if(value.length==0){
+                        return 'Ingrese una cadena de caracteres';
+                    }
+                    return true;
+                }
+            },
+            {
+                type: "input",
                 name: 'peerEndPoint',
                 message: 'Peer EndPoint:',
-                default: info.peerEndPoint,
+                default: defaultOptions.peerEndPoint || '45.33.36.153:51820',
                 validate(value){
                     if(!validator.isURL(value, 
                         [{ 
@@ -423,7 +455,7 @@ const listFiles= async( arrayFiles ) => {
                 type: "input",
                 name: 'peerAllowedIps',
                 message: 'Peer AllowedIps: ',
-                default: info.peerAllowedIps,
+                default: defaultOptions.peerAllowedIps || '0.0.0.0/0',
                 validate(value){
                     if(!validator.isIPRange(value)){
                         return 'Ingrese un rango IP correcto formato IP/(mask 32bits)';
@@ -435,9 +467,55 @@ const listFiles= async( arrayFiles ) => {
                 type: "input",
                 name: 'peerPersistentKeepAlive',
                 message: 'Peer PersistentKeepAlive: ',
-                default: info.peerPersistentKeepAlive
+                default: defaultOptions.peerPersistentKeepAlive || '25',
+                validate(value){
+                    if(!validator.isInt(value))
+                        return 'Ingrese un numero entero';
+                    return true;
+                }
             }
         ];
+
+    const showNewPeer = async (keys) => {
+
+        showKeys(keys);
+        
+        const questions = getQuestions({});
+
+        questions.unshift({
+            type: "input",
+            name: 'usuario',
+            message: 'Usuario: ',
+            default: '',
+            validate(value){
+                if(!validator.isAlphanumeric(value))
+                    return 'Ingrese un username valido con caracteres [a-zA-Z0-9]';
+                return true;
+            }
+        });
+        
+        //console.log(questions);
+
+        const opcion= await inquirer.prompt(questions);
+        return opcion;
+    }
+
+    const showUserList = async (data) => {
+
+        let choices=[];
+
+        data.forEach(user => {
+            choices.push({name:user.usuario, value:user.id});
+        });
+
+        console.log('');
+
+        const questions = [
+            {
+                type: "checkbox",
+                name: 'usersSelected',
+                message: 'Listado de usuarios: '.green,
+                choices}];
 
         const opcion= await inquirer.prompt(questions);
         return opcion;
@@ -455,5 +533,7 @@ module.exports={
     printUsers,
     showOpciones,
     confirmarBorrado, 
-    showPeerInfo
+    showPeerInfo,
+    showNewPeer,
+    showUserList
 };
