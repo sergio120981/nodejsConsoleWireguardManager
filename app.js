@@ -265,10 +265,14 @@ const main = async () => {
 
 			case 4.1:
 				if(confFile) {
+					const db=new BD();
+					const interface= await db.getFileInfo(confFile);
+					const peers=await db.getPeerByInterfaceId(confFile);
+					db.close();
 					if(await mvWgConfig(confFile)){
 						console.log('');
 						console.log('Fichero de configuracion salvado con exito'.green);
-						if(await putNewWgConfig(file)){
+						if(putNewWgConfig(interface, peers)){
 							console.log('');
 							console.log('Generado satisfactoriamente el nuevo fichero de configuracion'.green);
 						}

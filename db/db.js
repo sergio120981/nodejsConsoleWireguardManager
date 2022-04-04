@@ -145,6 +145,12 @@ class BD{
         
         return this._query(sql, []);
     }
+
+    getPeerByInterfaceId(interface_id){
+        const sql='select * from wg_peer where interface_id=? order by allowedIps'; 
+        
+        return this._query(sql, [interface_id]);
+    }
 }
 
 module.exports = BD;
