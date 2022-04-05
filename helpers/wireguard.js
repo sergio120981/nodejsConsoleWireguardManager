@@ -23,6 +23,24 @@ const getKeyAndPub = async () => {
     });
 }
 
+const manageService = async (file, action) => {
+    return new Promise ((resolve, reject)=> {
+        exec(`wg-quick ${action} ${file}`, (error, stdout, stderr) => {
+            if (error) {
+                reject(`error: ${error.message}`);
+                return;
+            }
+        
+            if (stderr) {
+                reject(`stderr: ${stderr}`);
+                return;
+            }
+            console.log(stdout.green);
+            resolve(true);
+        });
+    });
+}
+
 const mvWgConfig = async (file) => {
     return new Promise((resolve, reject)=>{
         exec(`mv ${file} ${file}.bak.${moment().format('YYYY-MM-DD_HH-m-s')} && umask 077 && touch ${file}`, (error, stdout, stderr) => {
@@ -35,6 +53,7 @@ const mvWgConfig = async (file) => {
                 reject(`stderr: ${stderr}`);
                 return;
             }
+            console.log(stdout.green);
             resolve(true);
         }); 
     })
@@ -69,4 +88,4 @@ AllowedIPs = ${peer.allowedIps}
     return true;
 }
 
-module.exports={getKeyAndPub, mvWgConfig, putNewWgConfig};
+module.exports={getKeyAndPub, mvWgConfig, putNewWgConfig, manageService};
