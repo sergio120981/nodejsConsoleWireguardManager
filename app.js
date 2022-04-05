@@ -272,7 +272,7 @@ const main = async () => {
 					if(await mvWgConfig(confFile)){
 						console.log('');
 						console.log('Fichero de configuracion salvado con exito'.green);
-						if(putNewWgConfig(interface, peers)){
+						if( await putNewWgConfig(interface, peers)){
 							console.log('');
 							console.log('Generado satisfactoriamente el nuevo fichero de configuracion'.green);
 						}

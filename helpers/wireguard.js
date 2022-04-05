@@ -25,7 +25,7 @@ const getKeyAndPub = async () => {
 
 const mvWgConfig = async (file) => {
     return new Promise((resolve, reject)=>{
-        exec(`mv ${file} ${file}.bak.${moment().format('YYYY-MM-DD_HH-m-s')}; touch ${file}`, (error, stdout, stderr) => {
+        exec(`mv ${file} ${file}.bak.${moment().format('YYYY-MM-DD_HH-m-s')} && umask 077 && touch ${file}`, (error, stdout, stderr) => {
             if (error) {
                 reject(`error: ${error.message}`);
                 return;
@@ -40,7 +40,7 @@ const mvWgConfig = async (file) => {
     })
 }
 
-const putNewWgConfig = (interface, peers) => {
+const putNewWgConfig = async (interface, peers) => {
     try {
         let salida=`[Interface]
 Address = ${interface[0].address}
@@ -60,8 +60,10 @@ AllowedIPs = ${peer.allowedIps}
 
     //console.log(interface[0].id);
     fs.writeFileSync(interface[0].id, salida);
+    
     } catch (error) {
-        console.log('Error escribiendo el .conf')
+        console.log('Error escribiendo el .conf: '+error);
+        //throw error;
         return false;
     }
     return true;
