@@ -1,4 +1,4 @@
-<h1>CLI app in Node to manage wireguard connections</h1>
+<h1>CLI app in NodeJS to manage wireguard connections</h1>
 
 This little CLI app allows:
  - manage the main data config about wireguard Interface 
